@@ -18,8 +18,8 @@ def load_historical_prices():
     df = pd.read_csv(CSV_PATH)
     df.columns = [c.strip().capitalize() for c in df.columns]
 
-    # Clean and reformat columns
-    df['Trade_date'] = pd.to_datetime(df['Date']).dt.strftime('%Y-%m-%d')
+    # Clean and reformat columns (Explicit format prevents memory overhead warnings)
+    df['Trade_date'] = pd.to_datetime(df['Date'], format='%m/%d/%y %H:%M').dt.strftime('%Y-%m-%d')
     df = df.rename(columns={
         'Open': 'open_price',
         'High': 'high_price',

@@ -44,6 +44,16 @@ def init_db():
     );
     """)
 
+    # Table 3: Bloomberg Volatility Surface
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS bbg_vol_surface (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tenor_type TEXT UNIQUE NOT NULL,
+        atm_vol REAL NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     conn.commit()
     conn.close()
     print(f"[Success] Database initialized with core tables at {DB_PATH}")

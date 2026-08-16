@@ -65,3 +65,28 @@ The architecture is designed to accommodate future quantitative layers without r
 │    • Role: Black-Scholes surface solving, 10,000-path Monte Carlo, GEX. │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+# Quantitative Methodology & Model Assumptions
+**Project:** XAU_Positioning_Pipeline
+**Asset Class:** COMEX Gold (GC) Derivatives
+
+---
+
+## 1. Portfolio Exposure & Notional Definitions
+
+**Assumption:** The pipeline tracks Gross Delivery Notional to map institutional hedging zones (Gamma radar), not real-time premium exposure.
+
+* **Gross USD Notional (At Expiration):**
+  $$\text{Gross Notional} = 100 \times \text{Open Interest} \times \text{Strike Price}$$
+  * *Purpose:* Identifies structural Support/Resistance walls. This metric calculates the absolute face value of the underlying gold that must be delivered, indicating where massive amounts of underlying gold must be bought or sold by dealers to hedge their gamma ($\Gamma$) exposure.
+
+* **Delta-Adjusted Notional (Pre-Expiration Exposure):**
+  $$\text{Delta-Adjusted Notional} = \Delta \times 100 \times \text{Open Interest} \times \text{Spot Price}$$
+  * *Purpose:* Reflects actual directional market exposure prior to expiration. (Tracked separately from structural walls).
+
+---
+
+## 2. Volatility Normalization Protocol
+
+* **Assumption:** Raw implied volatility data sourced from Bloomberg surfaces may be exported as raw integers (e.g., 15.25 for 15.25%).
+* **Engine Rule:** The pipeline enforces an automatic normalization protocol. Any volatility metric $V > 1.0$ is programmatically divided by 100. This prevents catastrophic VaR magnification during matrix multiplication phases.

@@ -1,6 +1,7 @@
-# project_state.md (Thread Transition State Document)
-**Last Updated:** 2026-08-13 03:20 PM EDT  
-**Project Name:** XAU_Positioning_Pipeline  
+# XAU Positioning Pipeline - Project State & Architecture
+**Last Updated:** 2026-08-15 10:57 PM EDT
+**Project Name:** XAU_Positioning_Pipeline
+**Current Phase:** Transitioning from Phase 2 (Quantitative Analytics) to Phase 3 (Advanced Analytics)
 **Notional Scope:** $10 Million USD Notional Spot Gold Book (Positioning Radar via CME Options & BBG Data)
 
 ---
@@ -14,17 +15,13 @@ The pipeline ingests raw CME VOI reports and Bloomberg outputs into a local SQLi
 * $\text{USD Notional} = \text{Open Interest} \times 100\text{ (oz)} \times \text{Strike Price}$
 * $\text{Parametric VaR}_{\alpha} = \text{Portfolio Notional} \times Z_{\alpha} \times \sigma_{\text{period}}$
 * $\text{Geometric Brownian Motion}: dS_t = \mu S_t dt + \sigma S_t dW_t$
-
-**Standardized Risk Terminology:**
-* **Operational PnL Variance:** The 68% statistical boundary ($Z = 1.000$).
-* **Active Trading Risk:** 95% Confidence Interval VaR ($Z = 1.645$).
-* **The Black Swan:** 99% Tail-Risk VaR ($Z = 2.326$).
+* $\text{Volume-Weighted Vol} = \frac{\sum (\text{Bucket Notional} \times \text{Bucket Volatility})}{\text{Total Portfolio Notional}}$
 
 ---
 
 ## 2. Permanent Directives & Data-Loss Prevention Protocol
 * **Formal Timestamping:** Every response must start with a formal EDT/UTC timestamp.
-* **State Preservation (`project_state.md`):** Maintained synchronously across threads to guarantee instant recovery.
+* **State Preservation (`project_state.md`):** Maintained synchronously across threads to guarantee instant recovery. Zero data loss permitted.
 * **The Collaborative Workflow Loop:** Discuss -> Brainstorm -> Teach -> Learn -> Confirm -> Proceed.
 * **Elite Pro Standard:** Balance structural modularity against unnecessary complexity. Standardize data cleaning strictly at the ETL layer.
 * **Optimize for Inheritability:** Prioritize explicit, highly readable scripts over implicit software-engineering consolidation.
@@ -32,65 +29,85 @@ The pipeline ingests raw CME VOI reports and Bloomberg outputs into a local SQLi
 
 ---
 
-## 3. Directory Structure & File Inventory
+## 3. Directory Structure & File Inventory (Locked Git Baseline)
 XAU_Positioning_Pipeline/
-├── .gitignore (Ignores __pycache__, .env, and data_raw/archive/)
-├── path_scanner.py (Root folder inspector utility)
+├── .gitignore (Shielding *.db, __pycache__, .env, and local path scanners)
 ├── docs/
-│   ├── docs_design_methodology.md (Contains Dual-Engine Architecture diagram)
+│   ├── docs_design_methodology.md
 │   ├── project_goals.md
-│   ├── project_roadmap.md
-│   ├── project_state.md (Current active thread state)
-│   └── quant_knowledge_base.md (Institutional desk mechanics & VaR math)
+│   └── project_state.md 
 ├── data_processed/
-│   ├── staging/ (Holds staging CSVs & audit_flags.csv)
-│   └── gold_master.db (SQLite Data Warehouse - Populated & Audited)
+│   ├── staging/ 
+│   └── gold_master.db (Target SQLite Data Warehouse)
 ├── data_raw/
-│   ├── cme_voi_20260811.xlsx (T-1 CME VOI Data)
-│   ├── cme_voi_20260812.xlsx (T-0 CME VOI Data)
-│   ├── historical_gold_data.csv (2026 Spot Gold OHLC Timeseries)
-│   ├── bbg_futures_curve.csv
-│   ├── bbg_vol_surface.csv
-│   └── archive/ (Holds retired legacy files)
-├── outputs/
-│   ├── executive_risk_dashboard.csv
-│   ├── historical_mc_simulation_report.csv
-│   └── support_resistance_walls_segmented.csv
-└── src/                            
+│   ├── bbg_futures_curve.csv 
+│   ├── bbg_vol_surface.csv 
+│   ├── cme_voi_20260811.xlsx 
+│   ├── cme_voi_20260812.xlsx 
+│   └── historical_gold_data.csv 
+├── outputs/ 
+└── src/                               
     ├── etl/
-    │   ├── extract_transform.py (Completed - Robust CME Sub-Header Parser)
-    │   ├── init_database.py (Database initialization script)
-    │   ├── load_cme_positioning.py (Idempotent CME Options Loader)
-    │   ├── load_historical_prices.py (Spot Price Loader)
-    │   └── run_pipeline.py (Master ETL Orchestrator)
+    │   ├── extract_cme_options.py (Completed - CME Sub-Header Parser & Regex Tenor Mapping)
+    │   ├── init_database.py (Completed - Idempotent Schema Setup incl. BBG table)
+    │   ├── load_cme_positioning.py (Completed - INSERT OR IGNORE Loader)
+    │   ├── load_historical_prices.py (Completed - Spot Price Loader with explicit parsing)
+    │   ├── load_bbg_vol.py (Completed - BBG CSV to DB Stager)
+    │   └── run_pipeline.py (Completed - Master ETL Orchestrator)
     ├── analytics/
-    │   └── analytics_engine.py (Core 1D/1W/1M VaR & Wall Segmenter)
-    ├── advanced_analytics/ (Specialized Decoupled Quant Engines)
-    │   ├── historical_simulator.py (Completed - Historical Replay & Monte Carlo)
-    │   ├── flow_velocity.py (Pending Phase 3 - T-1 vs T-0 Delta OI Smart Money Tracker)
-    │   └── gex_engine.py (Pending Phase 3 - Black-Scholes Dealer Gamma Exposure Radar)
+    │   └── analytics_engine.py (Completed - Core 1D/1W/1M VaR, Normalization, & Wall Segmenter)
+    ├── advanced_analytics/ 
+    │   ├── historical_simulator.py (Pending Phase 3.1 - Monte Carlo Math & Output Refinement)
+    │   ├── flow_velocity.py (Pending Phase 3.2 - T-1 vs T-0 Delta OI Smart Money Tracker)
+    │   └── gex_engine.py (Pending Phase 3.3 - Dealer Gamma Exposure Radar)
     └── utils/
-        ├── cme_auditor.py
-        └── db_warmup_check.py (Database Diagnostic Suite)
+        └── db_warmup_check.py (Completed - Database Diagnostic Suite & Sanity Printout)
 
 ---
 
 ## 4. Confirmed Data Schemas & Engineering Rules
 * **Functional Purity (ETL):** Module 1 cleans data, parses `.xlsx` sub-headers, and standardizes formats before staging.
-* **Database Idempotency:** `load_cme_positioning.py` uses strict `INSERT OR IGNORE` logic tied to a UNIQUE index to prevent duplicate records on multiple runs.
-* **Decoupled Advanced Analytics:** Engines inside `src/advanced_analytics/` run vectorized matrix math in-memory via Pandas/NumPy, keeping core database schemas untouched.
+* **Database Idempotency:** `load_cme_positioning.py` uses strict `INSERT OR IGNORE` logic tied to a UNIQUE index to prevent OI double-counting.
+* **Reference Data Centralization:** All reference files (Bloomberg) are explicitly staged into SQLite to enable native, high-speed SQL JOIN operations.
+* **Decoupled Advanced Analytics:** Engines inside `src/advanced_analytics/` run vectorized matrix math in-memory via Pandas/NumPy.
+* **Atomic Version Control:** Initial root commit executed. All future commits must be atomic and logically isolated.
 
 ---
 
-## 5. Current Progress & Roadmap Tracker
+## 5. Pipeline Execution Sequence (Phase 1)
+The Master Orchestrator (`src/etl/run_pipeline.py`) strictly enforces a 5-step process:
+1. **Initialize DB Schema:** `init_database.py`
+2. **Load Spot Prices:** `load_historical_prices.py` 
+3. **Extract CME Data:** `extract_cme_options.py` 
+4. **Load CME Data:** `load_cme_positioning.py` 
+5. **Load Bloomberg Data:** `load_bbg_vol.py` 
+6. **Audit & Sanity Check:** `db_warmup_check.py`
 
-### Completed Milestones
-* [x] **Phase 0:** Environment Setup, Git Identity Config, Directory Architecture.
-* [x] **Phase 1:** Built Core ETL Pipeline, database schema initialization, and spot price loader.
-* [x] **Phase 2:** Built Core Analytics Engine calculating parametric VaR and multi-horizon market walls.
-* [x] **Phase 3.1:** Built Historical Replay & Monte Carlo Simulator (`historical_simulator.py`).
-* [x] **Data Refactor:** Upgraded ETL to parse complex `.xlsx` CME sub-headers. Loaded contiguous T-1/T-0 dates seamlessly.
+---
 
-### Pending Next Steps (New Thread Readiness)
-1. **Build Engine 2 - Flow Velocity (`flow_velocity.py`):** Calculate $\Delta\text{OI}$ between $T-1$ and $T-0$ to flag institutional smart-money accumulation.
-2. **Build Engine 3 - Dealer Gamma Exposure (`gex_engine.py`):** Calculate Black-Scholes Net Dealer Gamma ($\Gamma$) profiles across strikes to map volatility pinning vs acceleration regimes.
+## 6. Quantitative Analytics Engine (Phase 2)
+*File:* `src/analytics/analytics_engine.py`
+- Performs native SQL `LEFT JOIN` using a `CASE` statement mapping CME strings ("Weekly"/"Monthly") directly to Bloomberg standard tenors ("1 Week"/"1 Month").
+- **Risk Constraint 1:** Explicitly isolates `MAX(trade_date)` to prevent time-series OI aggregation errors.
+- **Risk Constraint 2 (Hard Fail Protocol):** Instantly terminates execution via `ValueError` if Bloomberg volatility mapping fails, preventing silent VaR under-calculations.
+- **Risk Constraint 3 (Normalization Protocol):** Dynamically traps and normalizes whole-number Bloomberg volatility integers (e.g., 22.68) into decimal formats (0.2268) to prevent mathematical VaR blow-ups.
+- **Outputs:** `executive_risk_dashboard_{date}.csv` and `support_resistance_walls_{date}.csv`.
+
+---
+
+## 7. Current Milestones Reached
+- [x] **Phase 0:** Environment Setup & Workstation Directory Replication.
+- [x] **Phase 1 (ETL):** Built Core ETL Pipeline, database schemas, and spot price loader.
+- [x] Extracted multi-dimensional CME formatting into strict 1D relational tables.
+- [x] Patched memory leak warning in Pandas datetime logic.
+- [x] Solved Weekly vs Monthly contract undercounting (Regex tenor extraction).
+- [x] Migrated loose Volatility CSVs into structured SQLite tables.
+- [x] Deployed automated QA Sanity Check (Terminal Readout).
+- [x] **Phase 2 (Analytics):** Built VaR models and Support/Resistance Wall segmenter.
+- [x] Implemented Institutional Hard Fail for missing volatility data.
+- [x] Corrected Floating Point Volatility multiplier inflation (Normalization patch).
+- [ ] **Phase 3.1:** Execute & Validate Phase 3 Monte Carlo Simulator (`historical_simulator.py`).
+- [ ] **Phase 3.2:** Build Flow Velocity / Delta OI Tracker (`flow_velocity.py`).
+- [ ] **Phase 3.3:** Build Dealer Gamma Exposure Radar (`gex_engine.py`).
+
+---

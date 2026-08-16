@@ -1,0 +1,10 @@
+name: xau_pipeline
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - openpyxl
+  - sqlite
