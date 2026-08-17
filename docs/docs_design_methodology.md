@@ -72,7 +72,7 @@ The architecture is designed to accommodate future quantitative layers without r
 
 ---
 
-## 1. Portfolio Exposure & Notional Definitions
+## 7. Portfolio Exposure & Notional Definitions
 
 **Assumption:** The pipeline tracks Gross Delivery Notional to map institutional hedging zones (Gamma radar), not real-time premium exposure.
 
@@ -86,7 +86,16 @@ The architecture is designed to accommodate future quantitative layers without r
 
 ---
 
-## 2. Volatility Normalization Protocol
+## 8. Volatility Normalization Protocol
 
 * **Assumption:** Raw implied volatility data sourced from Bloomberg surfaces may be exported as raw integers (e.g., 15.25 for 15.25%).
 * **Engine Rule:** The pipeline enforces an automatic normalization protocol. Any volatility metric $V > 1.0$ is programmatically divided by 100. This prevents catastrophic VaR magnification during matrix multiplication phases.
+
+## 9. Database Abstraction Methodology: ORM vs. Raw SQL
+
+The quantitative portfolio demonstrates a deliberate, bifurcated approach to database engineering, utilizing different abstraction layers depending on the compute environment:
+
+* **Transactional Applications (SQLAlchemy ORM):** 
+  In the Macro-Sensitized Credit Risk Engine, an Object-Relational Mapper (ORM) is utilized. This is the optimal architecture for Online Transaction Processing (OLTP) systems. The ORM securely maps database rows to Python objects, handling individual loan modifications, enforcing complex referential integrity, and completely insulating the backend from SQL injection attacks.
+* **High-Frequency Quantitative Engines (Raw SQL + Pandas):** 
+  In the XAU Positioning Pipeline, Raw SQL is passed directly into `pandas.read_sql_query()`. This is the required architecture for Online Analytical Processing (OLAP) systems. In quantitative risk environments, mapping millions of rows of CME options data into Python ORM objects creates massive memory bottlenecks and latency. By bypassing the ORM, the engine executes queries at the C-level, leveraging vectorized matrix math for blisteringly fast, large-scale aggregations (e.g., grouping by strike and tenor) without overhead.
