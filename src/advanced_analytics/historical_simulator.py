@@ -101,48 +101,58 @@ def calculate_var_metrics(simulated_prices: np.ndarray, current_price: float, ho
 # ------------------------------------------------------------------------------
 def main():
     print("=" * 70)
-    print("     PHASE 3.1: VECTORIZED MONTE CARLO SIMULATOR (10,000 PATHS)")
+    print("      PHASE 3.1: VECTORIZED MONTE CARLO SIMULATOR (10,000 PATHS)")
     print("=" * 70)
-   
+    
     # 1. Fetch & Calibrate
     print("[1/3] Calibrating Stochastic Parameters from SQLite...")
     df = fetch_historical_prices()
     S0, last_date, mu, sigma = calibrate_gbm_parameters(df)
-   
+    
     print(f"  -> Latest Date    : {last_date}")
     print(f"  -> Spot Price     : ${S0:,.2f}")
     print(f"  -> Daily Drift (u): {mu:.6f}")
     print(f"  -> Daily Vol (o)  : {sigma:.6f}")
-   
+    
     # 2. Run Simulations
     print(f"\n[2/3] Executing {SIMULATION_PATHS:,} GBM Paths via NumPy...")
+    
+    # UPDATED: Added file-friendly suffixes for the CSV exports
     horizons = {
-        '1-Day': 1,
-        '1-Week (5d)': 5,
-        '1-Month (21d)': 21
+        '1-Day': (1, '1D'),
+        '1-Week (5d)': (5, '1W'),
+        '1-Month (21d)': (21, '1M')
     }
-   
+    
     results = []
-    for name, days in horizons.items():
+    # UPDATED: Unpacking the tuple to get days and file_suffix
+    for name, (days, file_suffix) in horizons.items():
         sim_prices = run_monte_carlo(S0, mu, sigma, days)
         metrics = calculate_var_metrics(sim_prices, S0, name)
         results.append(metrics)
-       
+        
+        # === THE NEW PATCH: Exporting Raw Paths for Visualization Engine ===
+        pd.DataFrame({'simulated_price': sim_prices}).to_csv(
+            OUTPUT_DIR / f"simulated_paths_{file_suffix}.csv", index=False
+        )
+        # ===================================================================
+        
     # 3. Save & Report
     print("\n[3/3] Generating Executive Risk Dashboard...")
     results_df = pd.DataFrame(results)
-   
+    
     output_file = OUTPUT_DIR / "historical_mc_simulation_report.csv"
     results_df.to_csv(output_file, index=False)
-   
+    
     print("\n" + "-" * 70)
     print(f"PORTFOLIO RISK ($10M NOTIONAL) - BENCHMARKED AT {last_date}")
     print("-" * 70)
     for index, row in results_df.iterrows():
         print(f"Horizon: {row['Horizon'].ljust(15)} | 95% VaR: ${row['Trading_VaR_95']:,.2f}")
-   
+    
     print("-" * 70)
     print(f"[Success] Full report saved to: {output_file}")
+    print(f"[Success] Raw distribution arrays saved to outputs/simulated_paths_*.csv")
     print("=" * 70)
 
 if __name__ == "__main__":
