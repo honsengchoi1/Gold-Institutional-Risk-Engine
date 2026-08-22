@@ -66,3 +66,27 @@ Traditional trading operations frequently rely on static notional caps (e.g., "M
 │  └── Pure CSV Input Ingestion ──► Interactive Web HUD (xau_interactive_hud.html) │
 │                                                                                  │
 └──────────────────────────────────────────────────────────────────────────────────┘
+
+---
+
+## 4. Quick Start & Execution Protocol
+
+This pipeline is designed for immediate local execution utilizing the bundled sample data.
+
+**1. Environment & Database Initialization (ETL)**
+Install dependencies and run the master orchestrator to build the SQLite database and ingest raw staging data:
+*   `conda env create -f environment.yml`
+*   `conda activate xau_pipeline`
+*   `python src/etl/run_pipeline.py`
+
+**2. Execute Quantitative Analytics Engines**
+Run the decoupled mathematical models to map structural walls, simulate stochastic VaR, track flow velocity, and model dealer gamma:
+*   `python src/analytics/analytics_engine.py`
+*   `python src/advanced_analytics/historical_simulator.py`
+*   `python src/advanced_analytics/flow_velocity.py`
+*   `python src/advanced_analytics/gex_engine.py`
+
+**3. Render the Decoupled Visual HUD**
+Execute the visualization script to ingest the newly generated analytics CSVs and render the Plotly HTML dashboard:
+*   `python src/visualization/risk_dashboard.py`
+*   *Double-click `outputs/xau_interactive_hud.html` to view the dashboard locally.*
