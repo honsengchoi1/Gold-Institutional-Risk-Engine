@@ -1,0 +1,10 @@
+Metric,Value
+Macro: Volume-Weighted Implied Vol (Annual),22.78%
+----------------------------------------,
+Portfolio: Base Notional Exposure,"$10,000,000"
+Portfolio: 1-Day Operational Variance (68%),"$143,490.70"
+Portfolio: 1-Day Black Swan VaR (99%),"$333,759.38"
+Portfolio: 1-Week Operational Variance (68%),"$320,854.97"
+Portfolio: 1-Week Black Swan VaR (99%),"$746,308.65"
+Portfolio: 1-Month Operational Variance (68%),"$657,557.01"
+Portfolio: 1-Month Black Swan VaR (99%),"$1,529,477.60"

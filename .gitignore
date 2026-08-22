@@ -3,16 +3,22 @@ __pycache__/
 .env
 .vscode/
 
-# Databases
+# Database Files
 *.db
 
-# Dynamically Generated Directories
-data_processed/
-outputs/
-
-# Local Drafts, Scratchpads & Assets
+# Dynamic Staging & Scratchpads
 path_scanner_v1.py
 docs/*.md
 docs/*.docx
 docs/assets/
 src/utils/cluster_exporter.py
+data_processed/
+
+# Outputs: Block everything, then explicitly allow ONLY executive summaries
+outputs/*
+!outputs/historical_mc_simulation_report.csv
+!outputs/flow_velocity_*.csv
+!outputs/executive_risk_dashboard_*.csv
+!outputs/support_resistance_walls_*.csv
+!outputs/global_strike_gravity_*.csv
+!outputs/gex_profile_*.csv
