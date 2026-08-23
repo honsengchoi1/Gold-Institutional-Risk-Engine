@@ -99,8 +99,8 @@ with tab_gex:
         plot_bgcolor="rgba(0,0,0,0)",
         height=480,
         title="Net Dealer Gamma Exposure ($3,800 - $5,200 Strike Corridor)",
-        xaxis=dict(title="Strike Price (USD)", tickformat="$,d"),
-        yaxis=dict(title="Net Dealer GEX (USD)", tickformat="$,.0s")
+        xaxis=dict(title="Strike Price (USD)", tickformat="$,d", fixedrange=True, range=[3800, 5200]),
+        yaxis=dict(title="Net Dealer GEX (USD)", tickformat="$,.0s", fixedrange=True)
     )
     st.plotly_chart(fig_gex, use_container_width=True)
 
@@ -133,8 +133,8 @@ with tab_walls:
         plot_bgcolor="rgba(0,0,0,0)",
         barmode="relative",
         title="Institutional Call vs. Put Open Interest Concentration",
-        xaxis=dict(title="Strike Price (USD)", tickformat="$,d"),
-        yaxis=dict(title="Open Interest (Contracts)", tickformat=",.0f"),
+        xaxis=dict(title="Strike Price (USD)", tickformat="$,d", fixedrange=True, range=[3800, 5200]),
+        yaxis=dict(title="Open Interest (Contracts)", tickformat=",.0f", fixedrange=True),
         height=450
     )
     st.plotly_chart(fig_grav, use_container_width=True)
