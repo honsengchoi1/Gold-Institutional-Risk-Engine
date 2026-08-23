@@ -4,6 +4,9 @@
 **Target Scope:** $10 Million USD Notional Spot Gold (XAU/USD) Portfolio
 **Core Infrastructure:** Python, SQLite, NumPy, Plotly, Streamlit (Decoupled OLAP Model)
 
+👉 **[View the Cloud-Deployed Interactive HUD (Streamlit App)](https://gold-institutional-risk-engine.streamlit.app)**  
+*(Quantitative Head-Up Display | Beta Build 1.0 | Offline Static Data Environment)*
+
 ---
 
 ## 1. Executive Summary & Business Objective
