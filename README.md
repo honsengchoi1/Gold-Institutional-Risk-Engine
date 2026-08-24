@@ -98,3 +98,18 @@ This beta utilizes static data. If integrated into a live desk via FIX API or Bl
 *   `cme_option_positioning`: Implements a composite `UNIQUE` constraint (`trade_date`, `tenor_type`, `contract_month`, `option_type`, `strike_price`) to categorically prevent Open Interest double-counting.
 *   `historical_spot_prices`: Tracks daily baseline prices ($S_0$) for parametric VaR log-return calibration.
 *   `bbg_vol_surface`: Tenor-mapped Volatility ($\sigma$), converting standard percentage points into pure decimals for matrix math.
+
+## 6. Model Governance & Theoretical Constraints
+To ensure transparent risk governance, this pipeline acknowledges several standard quantitative assumptions and limitations embedded within its core mathematical engines:
+
+*   **The EOD Fixed-Sign Blind Spot:** Standard models assign static multipliers to End-of-Day Open Interest (+1 for Calls, -1 for Puts), assuming dealers are structurally long calls. This fails to account for aggressive intraday macro buying, which can flip true dealer GEX negative and trigger unpredicted Gamma Squeezes.
+*   **The Black-Scholes European Constraint:** COMEX XAU/USD derivatives are American-style options. By utilizing a standard Black-Scholes pricing model, the engine inherently assumes European exercise, mathematically stripping out the early-exercise premium.
+*   **GBM & Fat Tails (Kurtosis):** The Monte Carlo simulator projects paths using Geometric Brownian Motion (GBM). Because GBM assumes log-normal returns and constant variance, the VaR metric structurally underprices "fat-tail" tail-risk events and exogenous macro shocks.
+*   **Frictionless Delta-Hedging:** The GEX profiler assumes market makers continuously and perfectly delta-hedge. In live market microstructure, hedging is delayed by order book liquidity limits and constrained by tick-size friction.
+
+## 7. Future Evolution: Tick-Data & NBBO Integration
+To eliminate the EOD assumptions and establish absolute mathematical truth ($GEX_{\text{true}}$), the next iteration of this pipeline will pivot to intraday flow analysis:
+
+*   **Lee-Ready Algorithm Integration:** Processing tick-by-tick options data against the National Best Bid and Offer (NBBO) to definitively categorize volume. Trades executing at the Ask indicate aggressive client buying (dealer short), while Bid executions indicate client selling (dealer long).
+*   **Dynamic GEX Ledger:** Replacing static EOD multipliers with a running tick-level ledger of aggressively bought versus sold volume to precisely pinpoint when a "Stabilizing Wall" structurally inverts into a "Squeeze Zone."
+*   **Columnar Data Architecture:** Transitioning the database from SQLite to highly compressed columnar formats (Parquet/HDF5) to process gigabyte-scale daily tick data without memory failure or read/write latency.
